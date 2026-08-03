@@ -1,0 +1,35 @@
+{
+  "description": "5 core gold queries agreed by the group for comparing baseline vs. high_accuracy retrieval strategies on data/uit/quy-trinh-danh-cho-sinh-vien.md. Relevance is judged by (procedure_slug correctness) AND (gold_keywords coverage), never by a fixed chunk_id, since chunking strategies differ.",
+  "queries": [
+    {
+      "id": "q1",
+      "question": "Sinh viên được đăng ký tối đa bao nhiêu tín chỉ trong một học kỳ? Khi nào được đăng ký 30 tín chỉ?",
+      "expected_procedure": "dang_ky_hoc_phan",
+      "gold_keywords": ["24 tín chỉ", "ĐTBC", "8,0", "30 tín chỉ"]
+    },
+    {
+      "id": "q2",
+      "question": "Trong đợt cứu xét đăng ký học phần, sinh viên được thay đổi những gì và có được đăng ký môn mới không?",
+      "expected_procedure": "dang_ky_hoc_phan",
+      "gold_keywords": ["học lại", "cải thiện", "dưới 30%", "không được phép ĐKHP mới"]
+    },
+    {
+      "id": "q3",
+      "question": "Sinh viên xin tạm dừng học tập vì lý do cá nhân phải đáp ứng điều kiện gì và được tạm dừng tối đa bao lâu?",
+      "expected_procedure": "tam_dung_hoc_tap",
+      "gold_keywords": ["học ít nhất 1 học kỳ", "không rơi vào các trường hợp bị đình chỉ", "01 đến tối đa 02 học kỳ chính liên tiếp"]
+    },
+    {
+      "id": "q4",
+      "question": "Sau khi hết thời hạn bảo lưu, sinh viên phải làm gì và hạn chót là khi nào?",
+      "expected_procedure": "tam_dung_hoc_tap",
+      "gold_keywords": ["đơn xin nhập học lại", "chậm nhất là 1 tháng trước", "Mẫu 07", "Mẫu 09"]
+    },
+    {
+      "id": "q5",
+      "question": "Để đăng ký xét tốt nghiệp, sinh viên cần đóng khoản gì, chuẩn bị hồ sơ nào và hoàn thành những nghĩa vụ nào?",
+      "expected_procedure": "xet_tot_nghiep",
+      "gold_keywords": ["lệ phí xét cấp bằng tốt nghiệp", "bằng tốt nghiệp THPT", "giấy khai sinh", "chứng chỉ ngoại ngữ", "nợ sách thư viện"]
+    }
+  ]
+}

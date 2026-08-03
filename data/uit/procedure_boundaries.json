@@ -1,0 +1,154 @@
+{
+  "$schema": "procedure-boundaries-v1",
+  "description": "Anchor-phrase configuration used by src/uit_preprocessing.py to split data/uit/quy-trinh-danh-cho-sinh-vien.md into per-procedure sections. Anchors are exact substrings that must be located, in this order, inside the NORMALIZED document text (after newline/whitespace/unicode/bullet cleanup). A section spans from its anchor's start offset up to (but not including) the next procedure's anchor start offset. query_keywords are used by src/retrieval.py's MetadataFilter to infer the likely procedure_slug for a user query; they are intentionally separate from the section-detection anchors.",
+  "source_document": {
+    "source_id": "uit_student_procedures",
+    "source_title": "Một số quy trình dành cho sinh viên",
+    "source_url": "https://student.uit.edu.vn/mot-so-quy-trinh-danh-cho-sinh-vien",
+    "institution": "UIT",
+    "audience": "student",
+    "document_type": "procedure"
+  },
+  "procedures": [
+    {
+      "slug": "quy_dinh_chung",
+      "title": "Quy định chung về liên hệ và xử lý yêu cầu",
+      "anchor": "### **QUY ĐỊNH CHUNG:**",
+      "detected_by": "markdown_heading",
+      "query_keywords": ["liên hệ", "kênh thông tin", "email phòng đào tạo"]
+    },
+    {
+      "slug": "bang_diem",
+      "title": "Đăng ký và nhận bảng điểm",
+      "anchor": "**Bước 1** : SV đăng ký bảng điểm trên trang web.",
+      "detected_by": "anchor_phrase",
+      "query_keywords": ["bảng điểm", "in bảng điểm", "lệ phí bảng điểm"]
+    },
+    {
+      "slug": "dang_ky_hoc_phan",
+      "title": "Đăng ký học phần (ĐKHP)",
+      "anchor": "**Bước 1:**  Khoảng một tháng trước khi bắt đầu học kỳ, P.ĐTĐH thông báo thời gian đăng ký học phần",
+      "detected_by": "anchor_phrase",
+      "query_keywords": ["đăng ký môn", "đăng ký học phần", "đkhp", "tín chỉ", "học lại", "cải thiện", "đợt cứu xét", "đợt 1", "đợt 2", "đợt 3"]
+    },
+    {
+      "slug": "chuyen_nganh",
+      "title": "Chuyển ngành học",
+      "anchor": "**+ SV được xem xét chuyển ngành học khác nếu có đủ các điều kiện sau",
+      "detected_by": "bold_heading",
+      "query_keywords": ["chuyển ngành", "đổi ngành"]
+    },
+    {
+      "slug": "chuyen_truong",
+      "title": "Chuyển trường",
+      "anchor": "+ **SV được xem xét chuyển Trường nếu có đủ các điều kiện sau",
+      "detected_by": "bold_heading",
+      "query_keywords": ["chuyển trường", "chuyển đến trường khác"]
+    },
+    {
+      "slug": "bao_luu_trung_tuyen",
+      "title": "Bảo lưu kết quả trúng tuyển",
+      "anchor": "+ **Bảo lưu kết quả trúng tuyển (kỳ thi tuyển sinh):",
+      "detected_by": "bold_heading",
+      "query_keywords": ["bảo lưu kết quả trúng tuyển", "bảo lưu trúng tuyển", "hoãn nhập học"]
+    },
+    {
+      "slug": "tam_dung_hoc_tap",
+      "title": "Tạm dừng học tập",
+      "anchor": "+ **Tạm dừng học tập:**",
+      "detected_by": "bold_heading",
+      "query_keywords": ["tạm dừng học", "bảo lưu", "nhập học lại", "tạm ngưng học"]
+    },
+    {
+      "slug": "hoan_thi",
+      "title": "Hoãn thi",
+      "anchor": "Trường hợp vì lý do cá nhân, SV không thể tham dự kỳ thi đúng tiến độ.",
+      "detected_by": "anchor_phrase",
+      "query_keywords": ["hoãn thi", "vắng thi", "thi lại"]
+    },
+    {
+      "slug": "thoi_hoc",
+      "title": "Thôi học",
+      "anchor": "**Bước 1:**  SV viết và nộp đơn xin thôi học (Mẫu 05)",
+      "detected_by": "anchor_phrase",
+      "query_keywords": ["thôi học", "nghỉ học", "xin nghỉ học"]
+    },
+    {
+      "slug": "gia_han_hoc_tap",
+      "title": "Gia hạn thời gian học tập",
+      "anchor": "Chỉ dành cho những SV đã quá thời gian đào tạo tối đa thiết kế cho Khóa học.",
+      "detected_by": "anchor_phrase",
+      "query_keywords": ["gia hạn học tập", "gia hạn thời gian học", "quá thời gian đào tạo"]
+    },
+    {
+      "slug": "phuc_khao",
+      "title": "Phúc khảo bài thi",
+      "anchor": "**Bước 1:** SV đăng ký phúc khảo trên hệ thống tại https://daa.uit.edu.vn/sinhvien/dkphuckhao",
+      "detected_by": "anchor_phrase",
+      "query_keywords": ["phúc khảo", "chấm phúc khảo"]
+    },
+    {
+      "slug": "giay_gioi_thieu",
+      "title": "Cấp giấy giới thiệu",
+      "anchor": "**Bước 1:** SV đăng ký tại tại: https://student.uit.edu.vn/sinhvien/dangky-giaygioithieu",
+      "detected_by": "anchor_phrase",
+      "query_keywords": ["giấy giới thiệu", "thực tập tốt nghiệp giấy giới thiệu"]
+    },
+    {
+      "slug": "mien_ngoai_ngu",
+      "title": "Miễn học phần ngoại ngữ (Tiếng Anh, Tiếng Nhật)",
+      "anchor": "**11. MIỄN HỌC PHẦN NGOẠI NGỮ (TIẾNG ANH, TIẾNG NHẬT)**",
+      "detected_by": "markdown_heading",
+      "query_keywords": ["miễn ngoại ngữ", "miễn tiếng anh", "chứng chỉ ngoại ngữ điểm miễn"]
+    },
+    {
+      "slug": "xet_tot_nghiep",
+      "title": "Xét tốt nghiệp",
+      "anchor": "Trường tổ chức xét Tốt nghiệp mỗi năm 04 đợt",
+      "detected_by": "anchor_phrase",
+      "query_keywords": ["tốt nghiệp", "xét tốt nghiệp", "hồ sơ tốt nghiệp", "lệ phí xét cấp bằng"]
+    },
+    {
+      "slug": "dieu_chinh_dang_ky_hoc_phan",
+      "title": "Điều chỉnh đăng ký học phần trực tuyến",
+      "anchor": "1. Quy trình gồm các bước (B) sau:",
+      "detected_by": "anchor_phrase",
+      "query_keywords": ["điều chỉnh đăng ký học phần", "hủy đăng ký học phần", "dkhp.uit.edu.vn"]
+    },
+    {
+      "slug": "hoc_chuong_trinh_thu_hai",
+      "title": "Học chương trình đào tạo thứ hai",
+      "anchor": "**Sinh viên trình độ đại học văn bằng 1 đang học tại Trường được đăng ký học thêm một chương trình đào tạo thứ hai",
+      "detected_by": "bold_heading",
+      "query_keywords": ["chương trình thứ hai", "văn bằng hai", "song ngành"]
+    },
+    {
+      "slug": "khieu_nai",
+      "title": "Khiếu nại",
+      "anchor": "**Bước 1:**  SV **điền** và nộp giấy đề nghị (Mẫu 06) tại P.ĐTĐH.",
+      "detected_by": "anchor_phrase",
+      "query_keywords": ["khiếu nại", "giấy đề nghị"]
+    },
+    {
+      "slug": "chuyen_he_dao_tao",
+      "title": "Chuyển hệ đào tạo (chính quy sang từ xa)",
+      "anchor": "Bước 1. Sinh viên liên hệ TT.PTCNTT để được tư vấn các vấn đề về học tập",
+      "detected_by": "anchor_phrase",
+      "query_keywords": ["chuyển hệ đào tạo", "đào tạo từ xa", "chính quy sang từ xa"]
+    },
+    {
+      "slug": "cong_nhan_tin_chi",
+      "title": "Công nhận tín chỉ trong đào tạo",
+      "anchor": "**20. QUY TRÌNH CÔNG NHẬN TÍN CHỈ TRONG ĐÀO TẠO**",
+      "detected_by": "markdown_heading",
+      "query_keywords": ["công nhận tín chỉ", "chuyển đổi tín chỉ"]
+    },
+    {
+      "slug": "bieu_mau",
+      "title": "Danh mục biểu mẫu",
+      "anchor": "| Mẫu | Tên biểu mẫu | Tải về |",
+      "detected_by": "table",
+      "query_keywords": ["biểu mẫu", "mẫu đơn", "danh sách mẫu"]
+    }
+  ]
+}

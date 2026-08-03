@@ -16,4 +16,13 @@ __pycache__/
 .idea/
 .omx/
 .venv/
+venv/
 src_w_solution/
+
+# RAG pipeline: local caches / vector indexes / model weights (never commit)
+# (benchmark/results/*.json|*.md ARE committed -- they are the graded report artifacts)
+.rag_cache/
+.hf-cache/
+.sentence-transformers/
+*.pkl
+cursor_rag_pipeline_implementation.md

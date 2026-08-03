@@ -1,0 +1,17 @@
+{
+  "description": "Diagnostic queries that probe failure/refusal behavior. NOT counted among the 5 core report queries in benchmark/gold_queries.json.",
+  "queries": [
+    {
+      "id": "d1",
+      "question": "Chi phí ký túc xá UIT hiện tại là bao nhiêu?",
+      "expected_procedure": null,
+      "in_corpus": false,
+      "expected_behavior": {
+        "retrieval_confidence": "low",
+        "must_not_hallucinate": true,
+        "expected_answer_contains": "Không tìm thấy thông tin này trong tài liệu UIT đã nạp."
+      },
+      "note": "data/uit/quy-trinh-danh-cho-sinh-vien.md never mentions dormitory (ký túc xá) fees. A correct system must refuse rather than invent an answer."
+    }
+  ]
+}

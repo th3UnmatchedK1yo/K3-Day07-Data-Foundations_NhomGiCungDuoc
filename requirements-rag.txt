@@ -1,0 +1,13 @@
+# Advanced UIT RAG pipeline dependencies (Phase 3+).
+# Not required for `pytest tests/ -v` (42 core tests use the mock embedder).
+# Install with: python -m pip install -r requirements-rag.txt
+#
+# sentence-transformers pulls in torch; the first run of a given model also
+# downloads model weights from the Hugging Face Hub (needs network access
+# once, then the model is cached locally under ~/.cache or HF_HOME).
+
+sentence-transformers>=3.0.0
+rank-bm25>=0.2.2
+openai>=1.40.0
+python-dotenv>=1.0.0
+numpy>=1.26.0

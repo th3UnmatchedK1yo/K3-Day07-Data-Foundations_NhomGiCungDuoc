@@ -30,19 +30,61 @@ class EmbeddingStore:
         try:
             import chromadb  # noqa: F401
 
-            # TODO: initialize chromadb client + collection
+            self._client = chromadb.Client()
+            self._collection = self._client.get_or_create_collection(name=collection_name)
             self._use_chroma = True
         except Exception:
             self._use_chroma = False
             self._collection = None
 
     def _make_record(self, doc: Document) -> dict[str, Any]:
-        # TODO: build a normalized stored record for one document
-        raise NotImplementedError("Implement EmbeddingStore._make_record")
+        """Build a normalized stored record (id/content/metadata/embedding) for one document."""
+        embedding = self._embedding_fn(doc.content)
+        return {
+            "id": doc.id,
+            "content": doc.content,
+            "metadata": dict(doc.metadata),
+            "embedding": [float(value) for value in embedding],
+        }
 
     def _search_records(self, query: str, records: list[dict[str, Any]], top_k: int) -> list[dict[str, Any]]:
-        # TODO: run in-memory similarity search over provided records
-        raise NotImplementedError("Implement EmbeddingStore._search_records")
+        """Run an in-memory similarity search over the provided records."""
+        if not records:
+            return []
+
+        query_embedding = self._embedding_fn(query)
+        scored = [
+            {
+                "id": record["id"],
+                "content": record["content"],
+                "metadata": record["metadata"],
+                "score": _dot(query_embedding, record["embedding"]),
+            }
+            for record in records
+        ]
+        scored.sort(key=lambda item: item["score"], reverse=True)
+        return scored[:top_k]
+
+    def _all_records(self) -> list[dict[str, Any]]:
+        """Return every stored record regardless of backend (Chroma or in-memory)."""
+        if self._use_chroma and self._collection is not None:
+            raw = self._collection.get(include=["documents", "metadatas", "embeddings"])
+            ids = raw.get("ids") or []
+            documents = raw.get("documents") or []
+            metadatas = raw.get("metadatas") or []
+            embeddings = raw.get("embeddings") or []
+            records = []
+            for index, record_id in enumerate(ids):
+                records.append(
+                    {
+                        "id": record_id,
+                        "content": documents[index] if index < len(documents) else "",
+                        "metadata": dict(metadatas[index]) if index < len(metadatas) and metadatas[index] else {},
+                        "embedding": list(embeddings[index]) if index < len(embeddings) else [],
+                    }
+                )
+            return records
+        return self._store
 
     def add_documents(self, docs: list[Document]) -> None:
         """
@@ -51,8 +93,18 @@ class EmbeddingStore:
         For ChromaDB: use collection.add(ids=[...], documents=[...], embeddings=[...])
         For in-memory: append dicts to self._store
         """
-        # TODO: embed each doc and add to store
-        raise NotImplementedError("Implement EmbeddingStore.add_documents")
+        for doc in docs:
+            record = self._make_record(doc)
+            if self._use_chroma and self._collection is not None:
+                self._collection.add(
+                    ids=[record["id"]],
+                    documents=[record["content"]],
+                    embeddings=[record["embedding"]],
+                    metadatas=[record["metadata"] or {}],
+                )
+            else:
+                self._store.append(record)
+            self._next_index += 1
 
     def search(self, query: str, top_k: int = 5) -> list[dict[str, Any]]:
         """
@@ -60,13 +112,13 @@ class EmbeddingStore:
 
         For in-memory: compute dot product of query embedding vs all stored embeddings.
         """
-        # TODO: embed query, compute similarities, return top_k
-        raise NotImplementedError("Implement EmbeddingStore.search")
+        return self._search_records(query, self._all_records(), top_k)
 
     def get_collection_size(self) -> int:
         """Return the total number of stored chunks."""
-        # TODO
-        raise NotImplementedError("Implement EmbeddingStore.get_collection_size")
+        if self._use_chroma and self._collection is not None:
+            return self._collection.count()
+        return len(self._store)
 
     def search_with_filter(self, query: str, top_k: int = 3, metadata_filter: dict = None) -> list[dict]:
         """
@@ -74,8 +126,14 @@ class EmbeddingStore:
 
         First filter stored chunks by metadata_filter, then run similarity search.
         """
-        # TODO: filter by metadata, then search among filtered chunks
-        raise NotImplementedError("Implement EmbeddingStore.search_with_filter")
+        records = self._all_records()
+        if metadata_filter:
+            records = [
+                record
+                for record in records
+                if all(record["metadata"].get(key) == value for key, value in metadata_filter.items())
+            ]
+        return self._search_records(query, records, top_k)
 
     def delete_document(self, doc_id: str) -> bool:
         """
@@ -83,5 +141,18 @@ class EmbeddingStore:
 
         Returns True if any chunks were removed, False otherwise.
         """
-        # TODO: remove all stored chunks where metadata['doc_id'] == doc_id
-        raise NotImplementedError("Implement EmbeddingStore.delete_document")
+        def _belongs_to(record: dict[str, Any]) -> bool:
+            # Chunks created via ingest.py carry an explicit metadata['doc_id'];
+            # standalone documents (no chunking) fall back to matching their own id.
+            return record["metadata"].get("doc_id", record["id"]) == doc_id
+
+        if self._use_chroma and self._collection is not None:
+            matching_ids = [record["id"] for record in self._all_records() if _belongs_to(record)]
+            if not matching_ids:
+                return False
+            self._collection.delete(ids=matching_ids)
+            return True
+
+        size_before = len(self._store)
+        self._store = [record for record in self._store if not _belongs_to(record)]
+        return len(self._store) < size_before

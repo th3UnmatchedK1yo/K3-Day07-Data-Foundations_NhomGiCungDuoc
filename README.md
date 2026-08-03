@@ -246,3 +246,57 @@ Xem chi tiết tại `docs/SCORING.md`. Tóm tắt:
 ```bash
 pytest tests/ -v
 ```
+
+---
+
+## Bổ Sung: Pipeline RAG Nâng Cao Cho Tài Liệu UIT (`data/uit/`)
+
+Ngoài bài lab gốc ở trên (giữ nguyên, không đổi), repo có thêm một pipeline RAG "high-accuracy"
+riêng cho tài liệu `data/uit/quy-trinh-danh-cho-sinh-vien.md`, dùng **DeepSeek** làm LLM sinh câu
+trả lời (không dùng cho embedding). Toàn bộ phần này nằm trong các **module mới**
+(`src/uit_preprocessing.py`, `src/structure_chunking.py`, `src/rag_embeddings.py`,
+`src/retrieval.py`, `src/deepseek_client.py`, `src/rag_pipeline.py`, `bench.py`) — không sửa
+`src/chunking.py`, `src/store.py`, `src/agent.py`, `src/embeddings.py`, `tests/test_solution.py`.
+
+Kiến trúc chi tiết, sơ đồ Mermaid và lý do thiết kế: xem **[docs/ARCHITECTURE_FLOW.md](docs/ARCHITECTURE_FLOW.md)**.
+
+### Cài đặt thêm
+
+```bash
+python -m pip install -r requirements-rag.txt   # sentence-transformers, rank-bm25, openai, ...
+cp .env.example .env                             # rồi điền DEEPSEEK_API_KEY (không commit key thật)
+```
+
+### Test
+
+```bash
+python -m pytest tests -v          # 42 passed — không đổi, vẫn dùng mock embedder
+python -m pytest tests_rag -v      # test cho các module RAG nâng cao (mocked, không tải model / không gọi API thật)
+```
+
+### Build index / truy vấn qua CLI
+
+```bash
+# Build index (embedding local thật — BAAI/bge-m3, fallback MiniLM đa ngữ nếu cần)
+python -m src.rag_pipeline build \
+  --source data/uit/quy-trinh-danh-cho-sinh-vien.md \
+  --strategy high_accuracy
+
+# Retrieve — KHÔNG cần DEEPSEEK_API_KEY
+python -m src.rag_pipeline retrieve \
+  --query "Sinh viên được đăng ký tối đa bao nhiêu tín chỉ?"
+
+# Ask — cần DEEPSEEK_API_KEY (đọc từ .env hoặc biến môi trường)
+python -m src.rag_pipeline ask \
+  --query "Sinh viên được đăng ký tối đa bao nhiêu tín chỉ?"
+```
+
+### Benchmark (baseline vs. high_accuracy)
+
+```bash
+python bench.py --compare-strategies --skip-generation   # chỉ retrieval, không cần API key
+python bench.py --compare-strategies                     # đầy đủ: retrieval + DeepSeek generation
+```
+
+Mỗi lần chạy ghi `benchmark/results/latest.json` và `benchmark/results/latest.md` (2 file này
+**được commit** — là báo cáo chấm điểm; xem kết quả benchmark thực tế đã chạy trong 2 file đó).
