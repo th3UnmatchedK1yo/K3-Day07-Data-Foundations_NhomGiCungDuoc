@@ -28,7 +28,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Callable
 
-from src.chunking import FixedSizeChunker
+from src.chunking import RecursiveChunker
 from src.models import Document
 from src.store import EmbeddingStore
 
@@ -87,7 +87,11 @@ def load_documents(data_dir: str | Path) -> list[Document]:
     """Đọc mọi file `.md`/`.txt` dưới `data_dir` thành `Document` (metadata từ front matter)."""
     data_path = Path(data_dir)
     documents: list[Document] = []
-    for path in sorted(data_path.rglob("*")):
+
+    # Cho phép truyền trực tiếp một file lẻ qua LAB_DATA_DIR, không chỉ thư mục.
+    candidate_paths = [data_path] if data_path.is_file() else sorted(data_path.rglob("*"))
+
+    for path in candidate_paths:
         if not path.is_file() or path.suffix.lower() not in TEXT_EXTENSIONS:
             continue
         metadata, body = parse_front_matter(path.read_text(encoding="utf-8"))
@@ -119,10 +123,10 @@ def build_knowledge_base(
 ) -> EmbeddingStore:
     """Đầu-cuối: file -> tài liệu đã parse -> chunk (kèm metadata) -> nạp vào store.
 
-    Truyền CHUNKER bạn chọn (mặc định `FixedSizeChunker`). Cần `EmbeddingStore`
+    Truyền CHUNKER bạn chọn (mặc định `RecursiveChunker`). Cần `EmbeddingStore`
     bạn đã hoàn thành ở Giai đoạn 2.
     """
-    chunker = chunker or FixedSizeChunker()
+    chunker = chunker or RecursiveChunker()
     chunk_docs: list[Document] = []
     for doc in load_documents(data_dir):
         chunk_docs.extend(chunk_document(doc, chunker))
@@ -133,7 +137,7 @@ def build_knowledge_base(
 
 
 def _self_check() -> int:
-    """Kiểm tra parser + gắn metadata mà KHÔNG cần EmbeddingStore (dùng FixedSizeChunker có sẵn)."""
+    """Kiểm tra parser + gắn metadata mà KHÔNG cần EmbeddingStore."""
     sample = (
         "---\n"
         "doc_id: demo-policy\n"
@@ -151,7 +155,7 @@ def _self_check() -> int:
     assert body.startswith("Câu nội dung thứ nhất."), repr(body)
 
     doc = Document(id="demo-policy", content=body * 20, metadata=meta)
-    chunks = chunk_document(doc, FixedSizeChunker(chunk_size=60, overlap=10))
+    chunks = chunk_document(doc, RecursiveChunker(chunk_size=60))
     assert len(chunks) > 1, "kỳ vọng nhiều hơn 1 chunk"
     assert all(c.metadata["doc_id"] == "demo-policy" for c in chunks), chunks
     assert all("chunk_index" in c.metadata for c in chunks), chunks
