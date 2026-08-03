@@ -26,3 +26,4 @@ src_w_solution/
 .sentence-transformers/
 *.pkl
 cursor_rag_pipeline_implementation.md
+report\REPORT_NHOM.md
